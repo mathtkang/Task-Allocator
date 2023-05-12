@@ -13,7 +13,7 @@ class Task(models.Model):
         on_delete=models.CASCADE,
         related_name="tasks",
     )
-    # task의 team 속성은 없앴다.
+    # task의 team 속성은 없앴다. (router에서 불러올 때는 create_user의 team 속성 참고해서 불러오기)
 
 
 class SubTask(models.Model):
@@ -47,22 +47,22 @@ class SubTask(models.Model):
     # )
 
 
-class Team(models.Model):
-    class TeamChoices(models.TextChoices):
-        DANBI = ("danbi", "Danbi")   # 단비
-        DARAE = ("darae", "Darae")   # 다래
-        BLABLA = ("blabla", "Blabla") # 블라블라
-        CHEOLLO = ("cheollo", "Cheollo") # 철로
-        TANGII = ("tangii", "Tangii") # 땅이
-        HAETAE = ("haetae", "Haetae")  # 해태
-        SUPI = ("supi", "Supi")  # 수피
+# class Team(models.Model):
+#     class TeamChoices(models.TextChoices):
+#         DANBI = ("danbi", "Danbi")   # 단비
+#         DARAE = ("darae", "Darae")   # 다래
+#         BLABLA = ("blabla", "Blabla") # 블라블라
+#         CHEOLLO = ("cheollo", "Cheollo") # 철로
+#         TANGII = ("tangii", "Tangii") # 땅이
+#         HAETAE = ("haetae", "Haetae")  # 해태
+#         SUPI = ("supi", "Supi")  # 수피
     
-    name = models.CharField(
-        max_length=50,
-        choices=TeamChoices.choices,
-    )
-    member = models.ForeignKey(
-        "users.User",
-        on_delete=models.CASCADE,
-        related_name="teams",
-    )
+#     name = models.CharField(
+#         max_length=50,
+#         choices=TeamChoices.choices,
+#     )
+#     member = models.ForeignKey(
+#         "users.User",
+#         on_delete=models.CASCADE,
+#         related_name="teams",
+#     )
