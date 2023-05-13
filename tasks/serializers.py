@@ -48,15 +48,12 @@ class SubTaskDetailSerializer(ModelSerializer):
     class Meta:
         model = SubTask
         fields = "__all__"
-        # read_only_fields = (
-        #     "is_complete",
-        # )
 
 
-class SubTaskUpdateCompleteSerializer(ModelSerializer):
-    
+class SubTaskUpdateOnlyCompleteSerializer(ModelSerializer):
+
     class Meta:
         model = SubTask
         fields = (
-            "is_complete"
+            "is_complete",
         )

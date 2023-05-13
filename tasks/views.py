@@ -21,7 +21,7 @@ from tasks.serializers import (
     TaskDetailSerializer, 
     SubTaskListSerializer, 
     SubTaskDetailSerializer,
-    SubTaskUpdateCompleteSerializer,
+    SubTaskUpdateOnlyCompleteSerializer,
 )
 
 
@@ -120,6 +120,14 @@ class TaskDetail(APIView):
         return Response(status=HTTP_204_NO_CONTENT)
 
 
+class SubTasksAll(APIView):
+    # (임시적) 모든 subtask 조회 -> 현재 상태: 모든 사람 다 조회 가능
+    def get(self, request):
+        all_subtasks = SubTask.objects.all()
+        serializer = SubTaskListSerializer(all_subtasks, many=True)
+        return Response(serializer.data)
+
+
 class SubTasks(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -130,22 +138,18 @@ class SubTasks(APIView):
         except Task.DoesNotExist:
             raise NotFound
 
-    # (임시적) 모든 subtask 조회 -> 현재 상태: 모든 사람 다 조회 가능
+    # (임시적) tid에 해당하는 모든 subtask 조회 -> 현재 상태: 모든 사람 다 조회 가능
     def get(self, request, tid):
-        all_subtasks = SubTask.objects.all()
-        serializer = SubTaskListSerializer(all_subtasks, many=True)
+        subtasks_of_tid = SubTask.objects.filter(task=tid)  # boolean : + .exists()
+        serializer = SubTaskListSerializer(subtasks_of_tid, many=True)
         return Response(serializer.data)
-
-    '''
-    지금 문제는
-    task의 id와 상관 없이 subtask를 만들 수 있다는 것?
-    '''
-
+    
+    
     # subtask 생성
     def post(self, request, tid): 
         '''
         ✅ 하나의 subtask에는 하나의 team만 설정된다. (팀 설정은 생성자가 설정하는거니까!)
-        ✅ 팀 생성시 상위 task 생성자인지 확인한다.
+        ✅ 팀 생성시 상위 task 생성자인지 확인 -> task 생성자만 subtask 생성 가능
         '''
         task = self.get_task_object(tid)
         # 지금 타고 온 (url상) task id의 user == user
@@ -191,33 +195,69 @@ class SubTaskDetail(APIView):
         return Response(serializer.data)
 
 
-    # subtask 전체적인 수정
+    # subtask 1개 수정
     def put(self, request, tid, stid):
         '''
-        - 완료처리 : 소속 팀원 만 처리 가능
-        - 모든 수정(subtask담당 team 수정 등)은 Task 작성자(create_user)만 가능 
+        ✅ Task 작성자(create_user)만 : 모든 수정(subtask담당 team 수정 등) 가능
+        ✅ 소속 팀원 만 : 완료처리(is_complete) 필드 만 업데이트 가능
+        - 모든 subtask가 complete되면 task도 자동으로 complete=True가 된다.
+            task == tid 인 subtask들의 is_complete이 모두 True라면, 해당 task(==tid)의 is_complete=True가 된다.
         '''
         subtask = self.get_subtask_object(tid, stid)
         user = request.user
 
-        # 할당된 subtask의 팀이름 != 접근한 user의 team이름 : 소속 팀원 아님
-        if subtask.team_name != user.team_name:
-            raise NotAuthenticated
-        
-        # is_complete 만 수정 가능한 시리얼라이저
-        serializer = SubTaskUpdateCompleteSerializer(
-            subtask,
-            data=request.data,
-            partial=True,
-        )
-        if serializer.is_valid():
-            updated_subtask = serializer.save()
-            return Response(
-                TaskDetailSerializer(updated_subtask).data,
+        # Task 생성자인 경우
+        if subtask.task.create_user == user:
+            serializer = SubTaskDetailSerializer(
+                subtask,
+                data=request.data,
+                partial=True,
             )
-        else:
-            return Response(serializer.errors)
+            if serializer.is_valid():
+                updated_subtask = serializer.save()
+                return Response(
+                    SubTaskDetailSerializer(updated_subtask).data,
+                )
+            else:
+                return Response(serializer.errors)
 
+        # Subtask 소속 팀원인 경우
+        elif subtask.team_name == user.team_name:
+            serializer = SubTaskUpdateOnlyCompleteSerializer(    # is_complete 만 수정 가능한 시리얼라이저
+                subtask,  # 기존에 있던 object
+                data=request.data,  # 새롭게 받은 data
+                partial=True,  # 부분적 업데이트
+            )
+            '''
+            ✅ 원하는 속성이 아닌 다른 속성이 들어온 경우, 에러 발생! is_complete 속성만 update 해준다.
+            '''
+            if serializer.is_valid():
+                completed_date = request.data.get("completed_date")
+                team_name = request.data.get("team_name")
+
+                if completed_date != None:
+                    return Response(
+                        {"detail": "completed_date를 수정할 수 없음"},
+                        status=HTTP_400_BAD_REQUEST,
+                    )
+                elif team_name != None:
+                    return Response(
+                        {"detail": "team_name를 수정할 수 없음"},
+                        status=HTTP_400_BAD_REQUEST
+                    )
+                
+                updated_subtask = serializer.save()
+                return Response(
+                    SubTaskUpdateOnlyCompleteSerializer(updated_subtask).data,
+                )
+            else:
+                return Response(serializer.errors)
+        else:
+            # raise NotAuthenticated
+            return Response(
+                {"detail": "해당 subtask를 할당 받은 팀원이 아니라서 subtask를 수정할 수 없습니다."},
+                status=HTTP_403_FORBIDDEN
+            )
 
 
 
@@ -225,7 +265,7 @@ class SubTaskDetail(APIView):
     # subtask 삭제
     def delete(self, request, tid, stid):
         '''
-        - 완료된 subtask는 삭제 불가능
+        ✅ 완료된 subtask는 삭제 불가능
         '''
         subtask = self.get_subtask_object(tid, stid)
         
@@ -236,15 +276,7 @@ class SubTaskDetail(APIView):
             )
 
         subtask.delete()
-        return Response(status=HTTP_204_NO_CONTENT)
-
-
-
-
-
-# class SubTaskUpdate(APIView):
-#     def put(self, request, tid, stid):
-#         '''
-
-#         '''
-#         pass
+        return Response(
+            {"detail": f"id가 {stid}인 subtask는 삭제되었습니다."},
+            status=HTTP_204_NO_CONTENT
+        )
