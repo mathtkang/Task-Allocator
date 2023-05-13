@@ -32,8 +32,9 @@ class SubTask(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     task = models.ForeignKey(
         "tasks.Task",
-        null=True, blank=True,
-        on_delete=models.SET_NULL,
+        # null=True,
+        # on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="subtasks",
     )
     team_name = models.CharField(
