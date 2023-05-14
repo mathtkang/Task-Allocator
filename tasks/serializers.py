@@ -57,3 +57,12 @@ class SubTaskUpdateOnlyCompleteSerializer(ModelSerializer):
         fields = (
             "is_complete",
         )
+
+
+class TaskAutoCompleteSerializer(ModelSerializer):
+
+    class Meta:
+        model = Task
+        fields = (
+            "is_complete",
+        )

@@ -22,15 +22,15 @@ from tasks.serializers import (
     SubTaskListSerializer, 
     SubTaskDetailSerializer,
     SubTaskUpdateOnlyCompleteSerializer,
+    TaskAutoCompleteSerializer,
 )
 
 
-# 여기에 어떤 작동을 하는지 자세히 글로 작성 <- 이걸 기반으로 코드 완료!
 class Tasks(APIView):
     # 모든 Task 조회
     def get(self, request): 
         '''
-        - 모든 사람이 접근 가능
+        ✅ 모든 사람이 접근 가능
         - subtask의 업무처리 여부에 대해서만 (해당 정보만) 반환 (task_id, subtask_id, complete=F/T) -> filter 참고하기!
         - subtask의 업무 처리 여부(is_complete)확인 가능 : 모든 사람 다 조회 가능 
         - team항목에 user의 team을 넣기 (모델에는 없지만, 조회시 보이도록)
@@ -60,8 +60,6 @@ class Tasks(APIView):
         
 
 class TaskDetail(APIView):
-    
-
     def get_task_object(self, tid):
         try:
             return Task.objects.get(id=tid)
@@ -97,6 +95,7 @@ class TaskDetail(APIView):
         )
         if serializer.is_valid():
             updated_task = serializer.save()
+
             return Response(
                 TaskDetailSerializer(updated_task).data,
             )
@@ -186,11 +185,37 @@ class SubTaskDetail(APIView):
                 return SubTask.objects.get(id=stid)
             except SubTask.DoesNotExist:
                 raise NotFound
+    
 
+    def validate_task_complete(self, tid, data):
+        task = self.get_task_object(tid)
+        all_subtasks = SubTask.objects.filter(task=tid).all()
+        
+        subtask_list = []
+        for subtask in all_subtasks:
+            subtask_list.append(subtask.is_complete)
+
+        auto_serializer = TaskAutoCompleteSerializer(
+            task,
+            data=data,
+        )
+        if all(subtask_list) == True:
+            if auto_serializer.is_valid():
+                auto_serializer.save(
+                    is_complete=True,
+                )
+        elif all(subtask_list) == False:
+            if auto_serializer.is_valid():
+                auto_serializer.save(
+                    is_complete=False,
+                )
 
     # (임시적) subtask 1개 조회
     def get(self, request, tid, stid):
+        '''✅ 만약 stid를 만족하는 subtask의 task가 tid와 다르다면 에러발생'''
         subtask = self.get_subtask_object(tid, stid)
+        if subtask.task.id != tid:
+            raise ValueError  # 요기 에러메시지 쫌 더 생각해보기
         serializer = SubTaskDetailSerializer(subtask)
         return Response(serializer.data)
 
@@ -200,8 +225,8 @@ class SubTaskDetail(APIView):
         '''
         ✅ Task 작성자(create_user)만 : 모든 수정(subtask담당 team 수정 등) 가능
         ✅ 소속 팀원 만 : 완료처리(is_complete) 필드 만 업데이트 가능
-        - 모든 subtask가 complete되면 task도 자동으로 complete=True가 된다.
-            task == tid 인 subtask들의 is_complete이 모두 True라면, 해당 task(==tid)의 is_complete=True가 된다.
+        ✅ 모든 subtask.complete=True면 task.complete는 자동으로 True가 된다.
+        ✅ subtask.complete가 하나라도 False라면 task.complete는 자동으로 False가 된다.
         '''
         subtask = self.get_subtask_object(tid, stid)
         user = request.user
@@ -215,13 +240,16 @@ class SubTaskDetail(APIView):
             )
             if serializer.is_valid():
                 updated_subtask = serializer.save()
+
+                self.validate_task_complete(tid, request.data)
+
                 return Response(
                     SubTaskDetailSerializer(updated_subtask).data,
                 )
             else:
                 return Response(serializer.errors)
 
-        # Subtask 소속 팀원인 경우
+        # Subtask 소속 팀원인 경우: is_complete 필드 만 업데이트 가능
         elif subtask.team_name == user.team_name:
             serializer = SubTaskUpdateOnlyCompleteSerializer(    # is_complete 만 수정 가능한 시리얼라이저
                 subtask,  # 기존에 있던 object
@@ -231,22 +259,20 @@ class SubTaskDetail(APIView):
             '''
             ✅ 원하는 속성이 아닌 다른 속성이 들어온 경우, 에러 발생! is_complete 속성만 update 해준다.
             '''
-            if serializer.is_valid():
-                completed_date = request.data.get("completed_date")
-                team_name = request.data.get("team_name")
+            completed_date = request.data.get("completed_date")
+            team_name = request.data.get("team_name")
 
-                if completed_date != None:
-                    return Response(
-                        {"detail": "completed_date를 수정할 수 없음"},
-                        status=HTTP_400_BAD_REQUEST,
-                    )
-                elif team_name != None:
-                    return Response(
-                        {"detail": "team_name를 수정할 수 없음"},
-                        status=HTTP_400_BAD_REQUEST
-                    )
-                
+            if completed_date != None or team_name != None:
+                return Response(
+                    {"detail": "해당 subtask의 completed_date 또는 team_name을 수정할 수 없다. is_complete 만 수정 가능하다."},
+                    status=HTTP_400_BAD_REQUEST,
+                )
+            
+            if serializer.is_valid():
                 updated_subtask = serializer.save()
+
+                self.validate_task_complete(tid, request.data)
+
                 return Response(
                     SubTaskUpdateOnlyCompleteSerializer(updated_subtask).data,
                 )
