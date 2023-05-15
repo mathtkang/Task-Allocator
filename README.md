@@ -17,12 +17,14 @@
 
 <br>
 
-## 🔫 Test-Code 완료
-<img width="956" alt="스크린샷 2023-05-16 오전 5 59 28" src="https://github.com/mathtkang/danbiedu/assets/51039577/2b58d522-de38-4bfc-a11f-c2eaa96419b0">
+###  🔫 Test-Code 완료
+<img width="800" alt="스크린샷 2023-05-16 오전 5 59 28" src="https://github.com/mathtkang/danbiedu/assets/51039577/2b58d522-de38-4bfc-a11f-c2eaa96419b0">
 
 <br>
+<br>
+<br>
 
-## request data 예시
+### request data 예시
 1. 회원가입 & 로그인시 필요한 데이터 예시 (`/v1/users/signup`, `/v1/users/login`)
 ```
 {
