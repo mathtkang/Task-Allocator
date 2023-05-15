@@ -81,6 +81,9 @@ class TaskDetail(APIView):
     
     # (추가 구현) Task 1개 반환
     def get(self, request, tid):
+        '''
+        🔫 test code 완료
+        '''
         task = self.get_task_object(tid)
         serializer = TaskDetailSerializer(task)
         return Response(serializer.data)
@@ -89,7 +92,7 @@ class TaskDetail(APIView):
     def put(self, request, tid):
         '''
         ✅ 모든 수정(subtask담당 team 수정 등)은 Task 작성자(create_user)만 가능
-            (즉 task의 complete은 누구도 수정할 수 없다) -> serializer에서 설정 완료!
+        ✅ task의 complete은 누구도 수정할 수 없다 -> serializer에서 설정 완료!
         🔫 test code 완료
         '''
         task = self.get_task_object(tid)
@@ -137,8 +140,12 @@ class TaskDetail(APIView):
 
 
 class SubTasksAll(APIView):
-    # (임시적) 모든 subtask 조회 -> 현재 상태: 모든 사람 다 조회 가능
+    # (추가구현) 모든 subtask 조회 : 모든 사람 조회 가능
+    '''
+    🔫 test code 완료
+    '''
     def get(self, request):
+    
         all_subtasks = SubTask.objects.all()
         serializer = SubTaskListSerializer(all_subtasks, many=True)
         return Response(serializer.data)
@@ -154,8 +161,11 @@ class SubTasks(APIView):
         except Task.DoesNotExist:
             raise NotFound
 
-    # (추가구현) tid에 해당하는 모든 subtask 조회 -> 현재 상태: 모든 사람 다 조회 가능
+    # (추가구현) tid에 해당하는 모든 subtask 조회 -> 모든 사람 다 조회 가능
     def get(self, request, tid):
+        '''
+        🔫 test code 완료
+        '''
         subtasks_of_tid = SubTask.objects.filter(task=tid)  # boolean : + .exists()
         serializer = SubTaskListSerializer(subtasks_of_tid, many=True)
         return Response(serializer.data)
@@ -166,6 +176,7 @@ class SubTasks(APIView):
         '''
         ✅ 하나의 subtask에는 하나의 team만 설정된다. (팀 설정은 생성자가 설정하는거니까!)
         ✅ 팀 생성시 상위 task 생성자인지 확인 -> task 생성자만 subtask 생성 가능
+        🔫 test code 완료
         '''
         task = self.get_task_object(tid)
         
@@ -198,6 +209,9 @@ class SubTaskDetail(APIView):
             raise NotFound
     
     def get_subtask_object(self, tid, stid):
+        '''
+        🔫 test code 완료
+        '''
         task = self.get_task_object(tid)
         if task is None:
             raise NotFound
@@ -209,6 +223,9 @@ class SubTaskDetail(APIView):
     
     # subtask의 complete에 따라 task의 complete가 자동으로 바뀌는 함수
     def validate_task_complete(self, tid, data):
+        '''
+        🔫 test code 완료
+        '''
         task = self.get_task_object(tid)
         all_subtasks = SubTask.objects.filter(task=tid).all()
         
@@ -236,10 +253,14 @@ class SubTaskDetail(APIView):
     def get(self, request, tid, stid):
         '''
         ✅ 만약 stid를 만족하는 subtask의 task가 tid와 다르다면 에러발생
+        🔫 test code 완료
         '''
         subtask = self.get_subtask_object(tid, stid)
         if subtask.task.id != tid:
-            raise ValueError  # 요기 에러메시지 쫌 더 생각해보기
+            return Response(
+                {"detail": f"subtask의 id:{stid}는 task의 id:{tid}에 속하지 않습니다."},
+                status=HTTP_400_BAD_REQUEST
+            )
         serializer = SubTaskDetailSerializer(subtask)
         return Response(serializer.data)
 
@@ -249,8 +270,11 @@ class SubTaskDetail(APIView):
         '''
         ✅ Task 작성자(create_user)만 : 모든 수정(subtask담당 team 수정 등) 가능
         ✅ 소속 팀원 만 : 완료처리(is_complete) 필드 만 업데이트 가능
+        🔫 test code 완료 => test_put()
         ✅ 모든 subtask.complete=True면 task.complete는 자동으로 True가 된다.
         ✅ subtask.complete가 하나라도 False라면 task.complete는 자동으로 False가 된다.
+        🔫 test code 완료 => test_validate_task_complete()
+
         '''
         subtask = self.get_subtask_object(tid, stid)
         user = request.user
@@ -319,6 +343,7 @@ class SubTaskDetail(APIView):
     def delete(self, request, tid, stid):
         '''
         ✅ 완료된 subtask는 삭제 불가능
+        🔫 test code 완료
         '''
         subtask = self.get_subtask_object(tid, stid)
         
