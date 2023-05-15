@@ -1,18 +1,21 @@
 import jwt
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
+from django.db.models import query
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.exceptions import ParseError, NotFound
+from rest_framework.exceptions import ParseError
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
-from users import models as m
+from users.models import User
 from users.serializers import SignUpSerializer, MeSerializer
+from tasks.models import Task, SubTask
+from tasks.serializers import SubTaskDetailSerializer, TaskandSubtaskListSerializer
 
 
-# DONE
 class SignUp(APIView):
     def post(self, request):
         password = request.data.get("password")
@@ -20,17 +23,18 @@ class SignUp(APIView):
             raise ParseError
         serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()  # 모델 객체가 만들어지고, 모델 객체의 값들이 할당이 다 된 model.save()가 호출이 되는 것이다.
-            # user.password = password  # We Don't Do this!
-            user.set_password(password)  # set_password() is hashed pw method of django
-            user.save()  # 이때 db에 user object가 저장됨
+            user = serializer.save()
+            user.set_password(password)
+            user.save()
             serializer = SignUpSerializer(user)
             return Response(serializer.data)
         else:
-            return Response(serializer.errors)
+            return Response(
+                serializer.errors,
+                status=HTTP_400_BAD_REQUEST,
+            )
 
 
-# DONE
 class LogIn(APIView):
     def post(self, request):
         username = request.data.get("username")
@@ -47,26 +51,27 @@ class LogIn(APIView):
         if user:
             login(request, user)
             return Response(
-                {"ok": "Welcome!"},
+                {"detail": "로그인 되었습니다."},
                 status=status.HTTP_200_OK,
             )
         else:
-            return Response({"error": "wrong password"})
+            return Response(
+                {"detail": "비밀번호가 틀렸습니다."},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
 
-# DONE
 class LogOut(APIView):
-    permission_classes = [IsAuthenticated]  # 로그인된 상태
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         logout(request)
         return Response(
             {"ok": "bye!"}, 
-            status=status.HTTP_200_OK
+            status=HTTP_200_OK,
         )
 
 
-# DONE
 class Me(APIView):  # team_name은 로그인 한 다음에 바꿀 수 있다.
     permission_classes = [IsAuthenticated]
 
@@ -88,13 +93,36 @@ class Me(APIView):  # team_name은 로그인 한 다음에 바꿀 수 있다.
             return Response(serializer.data)
         else:
             return Response(
-                # serializer.errors
-                {"detail": "Please request one of the 7 team names"}, 
+                {"detail": "지정된 7개의 팀명 중 하나의 팀명으로 입력해주세요."}, 
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
 
-# TODO
 class Todo(APIView):  # 업무목록 조회
-    # - subtask의 팀원이라면(권한) → 업무목록에서 함께 조회가 가능해야 함
-    pass
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        '''
+        ✅ 하위업무(SubTask)에 본인 팀이 포함되어 있다면, 업무목록에서 업무(Task)도 함께 조회 가능
+        = subtask의 팀원이면(권한) → 업무목록(해당 라우터)에서 상위 Task에 따른 모든 Subtask도 함께 조회 가능 
+            (그래야 본인팀의 subtask 완료와 함께 task를 완료하기 위해서는 추가적으로 어떤 subtask의 완료가 필요한지 알 수 있기 때문)
+        '''
+        user = request.user
+        all_subtasks = SubTask.objects.filter(team_name=user.team_name).all()  
+        
+        tasks_list = []
+        for subtask in all_subtasks:
+            tasks = Task.objects.get(id=subtask.task.id)
+            if tasks not in tasks_list:
+                tasks_list.append(tasks)
+
+        serializer = TaskandSubtaskListSerializer(tasks_list, many=True)
+        return Response(serializer.data)
+
+        '''
+        (경우2) subtast의 팀원인 경우, subtask_list만 보고 싶다면 아래 코드로 동작
+        '''
+        # user = request.user
+        # all_subtasks = SubTask.objects.filter(team_name=user.team_name).all()  
+        # serializer = SubTaskDetailSerializer(all_subtasks, many=True)
+        # return Response(serializer.data)
