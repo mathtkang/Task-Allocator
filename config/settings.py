@@ -47,7 +47,6 @@ SYSTEM_APPS = [
 ]
 
 CUSTOM_APPS = [
-    "common.apps.CommonConfig",
     "tasks.apps.TasksConfig",
     "users.apps.UsersConfig",
 ]
