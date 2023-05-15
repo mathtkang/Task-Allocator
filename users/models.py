@@ -21,7 +21,6 @@ class User(AbstractUser):
         HAETAE = ("haetae", "Haetae")  # 해태
         SUPI = ("supi", "Supi")  # 수피
 
-    # id = models.AutoField(primary_key=True)
     username = models.CharField(
         max_length=128,
         unique=True,
@@ -30,9 +29,3 @@ class User(AbstractUser):
         max_length=50,
         choices=TeamChoices.choices,
     )
-    # team = models.ForeignKey(
-    #     "tasks.Team",
-    #     null=True, blank=True,
-    #     on_delete=models.CASCADE,
-    #     related_name="users",
-    # )
