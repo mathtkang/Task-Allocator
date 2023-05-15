@@ -11,6 +11,15 @@ class SignUpSerializer(ModelSerializer):
         )
 
 
+class PublicUserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "team_name",
+        )
+
+
 class MeSerializer(ModelSerializer):
     class Meta:
         model = User
