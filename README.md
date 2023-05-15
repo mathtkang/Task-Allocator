@@ -3,6 +3,10 @@
 
 <br>
 
+## ⚙️ `.env` 파일을 다운 받을 수 있는 [Google Drive](https://drive.google.com/drive/folders/1GVXT_dHQl9hsvyQCuRdLdtUSqheZPd0S) 입니다.
+
+<br>
+
 ## 📑 과제 분석 및 진행과정 작성한 개인페이지 | [Notion](https://sprinkle-piccolo-9fc.notion.site/4f84847a4bf84e6283df767183154b5d)
 해당 페이지에 과제 분석 및 의사결정, ERD, API spec 등이 적혀있습니다.
 
@@ -14,10 +18,6 @@
 
 ## 🔫 Test-Code 완료
 <img width="956" alt="스크린샷 2023-05-16 오전 5 59 28" src="https://github.com/mathtkang/danbiedu/assets/51039577/2b58d522-de38-4bfc-a11f-c2eaa96419b0">
-
-<br>
-
-## ⚙️ `.env` 파일을 다운 받을 수 있는 [Google Drive](https://drive.google.com/drive/folders/1GVXT_dHQl9hsvyQCuRdLdtUSqheZPd0S) 입니다.
 
 <br>
 
