@@ -32,7 +32,8 @@ SECRET_KEY = env("SECRET_KEY")
 # DEBUG = True
 DEBUG = "RENDER" not in os.environ
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["15.164.245.240"]
 
 
 # Application definition
@@ -55,7 +56,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     # "rest_framework.authtoken",
     # "corsheaders",
-    # "drf_yasg",
+    "drf_yasg",
 ]
 
 INSTALLED_APPS = SYSTEM_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
