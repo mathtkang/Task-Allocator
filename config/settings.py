@@ -56,7 +56,6 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     # "rest_framework.authtoken",
     # "corsheaders",
-    "drf_yasg",
 ]
 
 INSTALLED_APPS = SYSTEM_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
