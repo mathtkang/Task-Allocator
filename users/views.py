@@ -13,7 +13,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from users.models import User
 from users.serializers import SignUpSerializer, MeSerializer
 from tasks.models import Task, SubTask
-from tasks.serializers import SubTaskDetailSerializer, TaskandSubtaskListSerializer
+from tasks.serializers import TaskandSubtaskListSerializer
 
 
 class SignUp(APIView):
@@ -52,7 +52,7 @@ class LogIn(APIView):
             login(request, user)
             return Response(
                 {"detail": "로그인 되었습니다."},
-                status=status.HTTP_200_OK,
+                status=HTTP_200_OK,
             )
         else:
             return Response(
@@ -67,7 +67,7 @@ class LogOut(APIView):
     def post(self, request):
         logout(request)
         return Response(
-            {"ok": "bye!"}, 
+            {"detail": "로그아웃 되었습니다."}, 
             status=HTTP_200_OK,
         )
 
@@ -108,7 +108,7 @@ class Todo(APIView):  # 업무목록 조회
             (그래야 본인팀의 subtask 완료와 함께 task를 완료하기 위해서는 추가적으로 어떤 subtask의 완료가 필요한지 알 수 있기 때문)
         '''
         user = request.user
-        all_subtasks = SubTask.objects.filter(team_name=user.team_name).all()  
+        all_subtasks = SubTask.objects.filter(team_name=user.team_name).all()
         
         tasks_list = []
         for subtask in all_subtasks:

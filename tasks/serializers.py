@@ -39,6 +39,7 @@ class TinyTaskSerializer(ModelSerializer):
             "create_user",
         )
 
+
 class SubTaskDetailSerializer(ModelSerializer):
     task = TinyTaskSerializer(read_only=True)
     

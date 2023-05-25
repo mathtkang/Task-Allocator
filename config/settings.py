@@ -137,13 +137,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ko-kr'
 
-TIME_ZONE = 'Asia/Seoul'
+TIME_ZONE = 'Asia/Seoul'  # 데이터 베이스 시간대 설정시 문자열로
 
-USE_I18N = True
+USE_I18N = True  # 장고 번역 시스템 활성화 여부
 
-# USE_L10N = True
+# USE_L10N = True  # 현지화 데이터 형식 사용 여부
 
-USE_TZ = False  # True 인 경우 디폴트로 미국 시간 사용. False 로 변경해 주어야 설정한 시간대로 변경됨.
+USE_TZ = False  # True(디폴트)인 경우 미국 시간 사용. False 로 변경해 주어야 설정한 시간대로 변경됨. (한국에서만 운영할 사이트, sqlite3에 날짜와 시간을 헷갈리지 않게 하기 위해서)
 
 
 # Static files (CSS, JavaScript, Images)
