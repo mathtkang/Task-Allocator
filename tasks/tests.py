@@ -8,7 +8,7 @@ DEFAULT_CONTENT="test content"
 DEFAULT_USERNAME="test username"
 DEFAULT_PASSWORD="test password"
 DEFAULT_COMPLETED_DATE="2023-12-25"
-DEFAULT_TEAM_NAME="danbi"
+DEFAULT_TEAM_NAME="sophia"
 BASE_URL="/v1/tasks"
 
 class TestTasks(APITestCase):

@@ -10,9 +10,6 @@ from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTT
 from rest_framework.response import Response
 from rest_framework.exceptions import (
     NotFound,
-    ParseError,
-    PermissionDenied,
-    NotAuthenticated,
 )
 from tasks.models import Task, SubTask
 from users.models import User
@@ -79,7 +76,7 @@ class TaskDetail(APIView):
         except Task.DoesNotExist:
             raise NotFound
     
-    # (추가 구현) Task 1개 반환
+    # Task 1개 반환
     def get(self, request, tid):
         '''
         🔫 test code 완료
@@ -140,7 +137,7 @@ class TaskDetail(APIView):
 
 
 class SubTasksAll(APIView):
-    # (추가구현) 모든 subtask 조회 : 모든 사람 조회 가능
+    # 모든 subtask 조회 : 모든 사람 조회 가능
     '''
     🔫 test code 완료
     '''
@@ -161,7 +158,7 @@ class SubTasks(APIView):
         except Task.DoesNotExist:
             raise NotFound
 
-    # (추가구현) tid에 해당하는 모든 subtask 조회 -> 모든 사람 다 조회 가능
+    # tid에 해당하는 모든 subtask 조회 -> 모든 사람 다 조회 가능
     def get(self, request, tid):
         '''
         🔫 test code 완료
@@ -249,7 +246,7 @@ class SubTaskDetail(APIView):
                 )
 
 
-    # (추가구현) subtask 1개 조회
+    # subtask 1개 조회
     def get(self, request, tid, stid):
         '''
         ✅ 만약 stid를 만족하는 subtask의 task가 tid와 다르다면 에러발생

@@ -105,7 +105,6 @@ class Todo(APIView):  # 업무목록 조회
         '''
         ✅ 하위업무(SubTask)에 본인 팀이 포함되어 있다면, 업무목록에서 업무(Task)도 함께 조회 가능
         = subtask의 팀원이면(권한) → 업무목록(해당 라우터)에서 상위 Task에 따른 모든 Subtask도 함께 조회 가능 
-            (그래야 본인팀의 subtask 완료와 함께 task를 완료하기 위해서는 추가적으로 어떤 subtask의 완료가 필요한지 알 수 있기 때문)
         '''
         user = request.user
         all_subtasks = SubTask.objects.filter(team_name=user.team_name).all()
@@ -118,11 +117,3 @@ class Todo(APIView):  # 업무목록 조회
 
         serializer = TaskandSubtaskListSerializer(tasks_list, many=True)
         return Response(serializer.data)
-
-        '''
-        (경우2) subtast의 팀원인 경우, subtask_list만 보고 싶다면 아래 코드로 동작
-        '''
-        # user = request.user
-        # all_subtasks = SubTask.objects.filter(team_name=user.team_name).all()  
-        # serializer = SubTaskDetailSerializer(all_subtasks, many=True)
-        # return Response(serializer.data)

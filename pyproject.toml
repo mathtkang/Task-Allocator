@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "danbiedu"
+name = "task-allocator"
 version = "0.1.0"
 description = ""
 authors = ["sgaeng <ksge1124@gmail.com>"]

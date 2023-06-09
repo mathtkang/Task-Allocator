@@ -1,5 +1,5 @@
-# danbiedu
-단비교육 사전과제 레포지토리입니다.
+# Task-Allocator
+하나의 Task를 여러 SubTask로 나누고 다른 팀에게 할당하는 서비스입니다. 업무목록을 통해 진행과정 및 Task의 완료/미완료 되었는지 알 수 있습니다.
 
 <br>
 
@@ -7,8 +7,8 @@
 
 <br>
 
-## 📑 과제 분석 및 진행과정 작성한 개인페이지 | [Notion](https://sprinkle-piccolo-9fc.notion.site/4f84847a4bf84e6283df767183154b5d)
-해당 페이지에 과제 분석 및 의사결정, ERD, API spec 등이 적혀있습니다.
+## 📑 요구사항 정리 및 API spec | [Notion]()
+요구사항 정리 및 ERD, API spec 등이 적혀있습니다.
 
 <br>
 
@@ -18,7 +18,7 @@
 <br>
 
 ###  🔫 Test-Code 완료
-<img width="800" alt="스크린샷 2023-05-16 오전 5 59 28" src="https://github.com/mathtkang/danbiedu/assets/51039577/2b58d522-de38-4bfc-a11f-c2eaa96419b0">
+<img width="800" alt="Test-Code" src="https://user-images.githubusercontent.com/51039577/244661736-61bc1881-990b-4ee8-99f1-e47b9fc206dc.png">
 
 <br>
 <br>
@@ -28,14 +28,14 @@
 1. 회원가입 & 로그인시 필요한 데이터 예시 (`/v1/users/signup`, `/v1/users/login`)
 ```
 {
-    "username":"danbi",
+    "username":"Sophia",
     "password": "1234"
 }
 ```
 2. 마이페이지 팀 이름 업데이트 데이터 예시 (`/v1/users/me`)
 ```
 {
-    "team_name": "danbi"
+    "team_name": "Sophia"
 }
 ```
 3. Task 생성 시 필요한 데이터 예시 (`/v1/tasks`)
@@ -49,13 +49,13 @@
 ```
 {
     "completed_date": "2026-10-24",
-    "team_name": "danbi"
+    "team_name": "Sophia"
 }
 ```
 
 <br>
 
-## setting step
+## Setting step
 
 [환경설정 시 참고하면 좋은 블로그 (본인 블로그 입니다)](https://kkangsg.tistory.com/108)
 

@@ -13,13 +13,10 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     class TeamChoices(models.TextChoices):
-        DANBI = ("danbi", "Danbi")   # 단비
-        DARAE = ("darae", "Darae")   # 다래
-        BLABLA = ("blabla", "Blabla") # 블라블라
-        CHEOLLO = ("cheollo", "Cheollo") # 철로
-        TANGII = ("tangii", "Tangii") # 땅이
-        HAETAE = ("haetae", "Haetae")  # 해태
-        SUPI = ("supi", "Supi")  # 수피
+        SOPHIA = ("sophia", "Sophia")
+        ISABELLA = ("isabella", "Isabella")
+        LINA = ("lina", "Lina")
+        NOAH = ("noah", "Noah")
 
     username = models.CharField(
         max_length=128,
