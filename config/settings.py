@@ -32,8 +32,7 @@ SECRET_KEY = env("SECRET_KEY")
 # DEBUG = True
 DEBUG = "RENDER" not in os.environ
 
-# ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ["15.164.245.240"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
