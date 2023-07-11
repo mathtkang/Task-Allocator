@@ -53,8 +53,7 @@ class Tasks(APIView):
                 task = serializer.save(
                     create_user=user
                 )
-                serializer = TaskDetailSerializer(task)
-                return Response(serializer.data)
+                return Response(TaskDetailSerializer(task).data)
             else:
                 return Response(
                     serializer.errors,
