@@ -3,10 +3,6 @@
 
 <br>
 
-## ⚙️ `.env` 파일을 다운 받을 수 있는 [Google Drive](https://drive.google.com/drive/folders/1GVXT_dHQl9hsvyQCuRdLdtUSqheZPd0S) 입니다.
-
-<br>
-
 ## 📑 요구사항 정리 및 API spec | [Notion]()
 요구사항 정리 및 ERD, API spec 등이 적혀있습니다.
 
